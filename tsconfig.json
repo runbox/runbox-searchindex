@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "build",
+    "target": "es5",
+    "module": "commonjs", 
+    "sourceMap": true,   
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "lib": ["es2017", "dom"],
+    "noImplicitUseStrict": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "files": [    
+    "ts/test/test.ts"
+  ]  
+}
