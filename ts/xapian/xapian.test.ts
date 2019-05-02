@@ -116,6 +116,17 @@ const contents = [
         equal(xapian.hasMessageId(totalMessages + 1), false);
     }
 
+    @test() getFolder() {
+        const xapian = new XapianAPI();
+        const documentXTermList: (docid: number) => number = global['Module'].cwrap('documentXTermList', 'number', ['number']);
+        const termcount = documentXTermList(30);
+        
+        global['Module']['documenttermlistresult']
+        equal(global['Module']['documenttermlistresult'].length, 6);
+        equal(global['Module']['documenttermlistresult']
+            .find(term => term.indexOf('XFOLDER:Inbox') === 0) ? true : false, true);
+    }
+
     @test() searchMessages() {
         const xapian = new XapianAPI();
         const maxresults = 20;

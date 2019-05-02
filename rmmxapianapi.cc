@@ -384,6 +384,30 @@ extern "C" {
     }
 
     /**
+     * return terms starting with X of given document id
+     */
+    int EMSCRIPTEN_KEEPALIVE documentXTermList(int docid) {
+      Xapian::Document doc = dbc->db.get_document(docid);
+      int numterms = 0;      
+      
+      Xapian::TermIterator termitbeg = doc.termlist_begin();
+      Xapian::TermIterator termitend = doc.termlist_end();
+      
+      EM_ASM(Module['documenttermlistresult'] = []);
+
+      for (Xapian::TermIterator tm = termitbeg; tm != termitend; ++tm) {
+        if((*tm).at(0) == 'X') {
+          EM_ASM_({
+            Module['documenttermlistresult'].push(Pointer_stringify($0));
+          },(*tm).c_str());
+          numterms++;
+        }
+      }     
+      
+      return numterms;
+    }
+
+    /**
      * Copy termlist of given termprefix into 
      */
     int EMSCRIPTEN_KEEPALIVE termlist(char * termprefix) { 
