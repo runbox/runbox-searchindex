@@ -410,7 +410,7 @@ extern "C" {
 
       for (Xapian::TermIterator tm = termitbeg; tm != termitend; ++tm) {        
         EM_ASM_({
-          Module['documenttermlistresult'].push(Pointer_stringify($0));
+          Module['documenttermlistresult'].push(UTF8ToString($0));
         },(*tm).c_str());
         numterms++;
       }     
@@ -433,7 +433,7 @@ extern "C" {
       for (Xapian::TermIterator tm = termitbeg; tm != termitend; ++tm) {
         if((*tm).at(0) == 'X') {
           EM_ASM_({
-            Module['documenttermlistresult'].push(Pointer_stringify($0));
+            Module['documenttermlistresult'].push(UTF8ToString($0));
           },(*tm).c_str());
           numterms++;
         }
@@ -455,7 +455,7 @@ extern "C" {
       for (Xapian::TermIterator tm = termitbeg; tm != termitend; ++tm) {
         std::string term = (*tm).substr(prefix.length());
         EM_ASM_({
-          termlistresult.push(Pointer_stringify($0))
+          termlistresult.push(UTF8ToString($0))
         },term.c_str());
         numterms++;
       }     

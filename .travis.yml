@@ -1,0 +1,30 @@
+os: linux
+addons:
+  apt:
+    packages:
+      - doxygen
+      - graphviz
+      - help2man
+      - python-docutils
+      - python-pygments
+      - pngcrush
+language: node_js
+node_js:
+  - node
+services:
+  - docker
+before_script:
+  # Bootstrap only xapian-core for emscripten build.
+  - git clone https://github.com/xapian/xapian
+  - cd xapian
+  - ./bootstrap xapian-core
+  - ./configure CXXFLAGS=-O0 --disable-backend-honey --disable-backend-inmemory --disable-backend-remote
+  - make -j2
+  - make -j2 distclean
+  - cd xapian-core
+  - docker run -v $(pwd):/src trzeci/emscripten emconfigure ./configure CPPFLAGS='-DFLINTLOCK_USE_FLOCK' CXXFLAGS='-Oz -s USE_ZLIB=1 -fno-rtti' --disable-backend-honey --disable-backend-inmemory --disable-shared --disable-backend-remote
+  - docker run -v $(pwd):/src trzeci/emscripten emmake make
+  - cd ../..
+script:
+  - docker run -v $(pwd):/src trzeci/emscripten node compilermmxapianapi.js --xapiandir=xapian/xapian-core
+  - npm run test-no-watch
