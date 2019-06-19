@@ -85,13 +85,34 @@ public:
       }
       return writabledatabase;
     }
+
+    Xapian::Document getDocumentByUniqueTerm(char * unique_term, Xapian::WritableDatabase * writabledatabasePtr) {
+      Xapian::Document doc;   
+      Xapian::PostingIterator p = dbw.postlist_begin(unique_term);
+      
+      if (p != dbw.postlist_end(unique_term)) {
+        doc = dbw.get_document(*p);        
+        *writabledatabasePtr = dbw;        
+      } else {      
+        for(int i = 0; i < addedWritableDatabases.size(); i++) {
+          Xapian::WritableDatabase partitionWritableDatabase = addedWritableDatabases[i];
+          
+          Xapian::PostingIterator p = partitionWritableDatabase.postlist_begin(unique_term);
+          if (p != partitionWritableDatabase.postlist_end(unique_term)) {
+            
+            doc = partitionWritableDatabase.get_document(*p);
+            *writabledatabasePtr = partitionWritableDatabase;
+            break;
+          }
+        }
+      }
+      return doc;
+    }
 };
 
 DatabaseContainer *dbc;
 
 extern "C" {
-
-
     void EMSCRIPTEN_KEEPALIVE initXapianIndex(const char * path) {                
         dbc = new DatabaseContainer();
         dbc->openDatabaseAsWritable(path);
@@ -305,30 +326,44 @@ extern "C" {
        return Xapian::sortable_unserialise(dbc->db.get_document(docid).get_value(slot));
     }
     
-    void EMSCRIPTEN_KEEPALIVE changeDocumentsFolder(char * unique_term, char * folder) {
-      Xapian::Document doc;   
-      Xapian::WritableDatabase writabledatabase;   
-      Xapian::PostingIterator p = dbc->dbw.postlist_begin(unique_term);
+    void EMSCRIPTEN_KEEPALIVE addTermToDocument(char * unique_id_term, char * term) {
+      Xapian::WritableDatabase writabledatabase;
+      Xapian::Document doc = dbc->getDocumentByUniqueTerm(unique_id_term, &writabledatabase);
+      doc.add_term(term);
+      writabledatabase.replace_document(unique_id_term,doc);     
+    }
+
+    void EMSCRIPTEN_KEEPALIVE removeTermFromDocument(char * unique_id_term, char * term) {
+      Xapian::WritableDatabase writabledatabase;
+      Xapian::Document doc = dbc->getDocumentByUniqueTerm(unique_id_term, &writabledatabase);
+      doc.remove_term(term);
+      writabledatabase.replace_document(unique_id_term,doc);     
+    }
+    
+    void EMSCRIPTEN_KEEPALIVE addTextToDocument(char * unique_id_term, bool without_positions, char * text) {
+      Xapian::WritableDatabase writabledatabase;
+      Xapian::Document doc = dbc->getDocumentByUniqueTerm(unique_id_term, &writabledatabase);
       
-      if (p != dbc->dbw.postlist_end(unique_term)) {
-        doc = dbc->dbw.get_document(*p);
-        writabledatabase = dbc->dbw;
-      } else {      
-        for(int i = 0; i < dbc->addedWritableDatabases.size(); i++) {
-          Xapian::WritableDatabase dbw = dbc->addedWritableDatabases[i];
-          
-          Xapian::PostingIterator p = dbw.postlist_begin(unique_term);
-          if (p != dbw.postlist_end(unique_term)) {
-            
-            doc = dbw.get_document(*p);
-            writabledatabase = dbw;
-            break;
-          }
-        }
+      // Set up a TermGenerator that we'll use in indexing.
+      Xapian::TermGenerator termgenerator;
+
+      termgenerator.set_max_word_length(32);
+      termgenerator.set_document(doc);
+      if(without_positions) {
+        termgenerator.index_text_without_positions(text);
+      } else {
+        termgenerator.index_text(text);
       }
+      writabledatabase.replace_document(unique_id_term,doc);     
+    }
+
+    void EMSCRIPTEN_KEEPALIVE changeDocumentsFolder(char * unique_id_term, char * folder) {      
+      Xapian::WritableDatabase writabledatabase;
+      Xapian::Document doc = dbc->getDocumentByUniqueTerm(unique_id_term, &writabledatabase);
       
       Xapian::TermIterator termitbeg = doc.termlist_begin();
       Xapian::TermIterator termitend = doc.termlist_end();
+      
       
       bool unread = false;
       for (Xapian::TermIterator tm = termitbeg; tm != termitend; ++tm) {    
@@ -350,7 +385,7 @@ extern "C" {
         doc.add_term(buffer);
       }
 
-      writabledatabase.replace_document(unique_term,doc);     
+      writabledatabase.replace_document(unique_id_term,doc);     
     }
 
     /**
