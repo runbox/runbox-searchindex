@@ -1,5 +1,13 @@
 const execSync = require('child_process').execSync;
 
+const xapianDirArgName = '--xapiandir=';
+const xapianDirArg = process.argv.find(arg => arg.indexOf(xapianDirArgName)===0);
+if (xapianDirArg) {
+  
+  process.env.XAPIAN = xapianDirArg.substr(xapianDirArgName.length);
+  console.log('XAPIAN', process.env.XAPIAN);
+}
+
 if(!process.env.XAPIAN) {
   console.error("Environment variable XAPIAN must be set to the location of xapian_core");
 } else {

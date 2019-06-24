@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.com/runbox/runbox-searchindex.svg?branch=master)](https://travis-ci.com/runbox/runbox-searchindex)
+
 Runbox searchindex - for searching and indexing emails in the browser or node.js
 ================================================================================
 
@@ -24,12 +26,16 @@ Still there are cases where you don't want to download the searchindex, and you 
 Modern web applications makes more and more use of the browsers local storage for cache, storing settings, content and more. This gives us better performance and even offline capabilities, but also require more awareness of what browser and device we use. When not using your own private device, you should use private browsing so that nothing is stored on that device. Also for your private devices you should consider using an operating system that offers encrypted file systems.
 
 ## How to build
-This project depends on https://github.com/xapian/xapian and that you have built it using Emscripten.
+This project depends on https://github.com/xapian/xapian and that you have built it using Emscripten as written here:
+
+https://github.com/xapian/xapian/blob/master/xapian-core/emscripten/README.md
 
 In order to build the web assembly binaries you will have to set the `XAPIAN` environment variable to
 the location of the `xapian_core` folder of your Xapian emscripten build.
 
 You may then build it using `XAPIAN=xapian_core_location npm run build`
+
+You can also have a look at the [.travis.yml](.travis.yml) file for a complete build and test procedure (which is run on every push).
 
 ## Running tests
 
