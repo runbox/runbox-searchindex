@@ -4,13 +4,12 @@
     "scripts": {
         "build": "node compilermmxapianapi.js",
         "test": "mocha-typescript-watch -p tsconfig.json build/test/test.js",
-        "test-no-watch": "tsc -p tsconfig.json && mocha build/test/test.js"
-    },
-    "dependencies": {
-        "runbox7lib": "^0.2.0",
-        "rxjs": "^6.3.3"
+        "test-no-watch": "tsc -p tsconfig.json && mocha build/test/test.js",
+        "preparelib": "node preparelibrary.js"
     },
     "devDependencies": {
+        "runbox7lib": "^0.2.0",
+        "rxjs": "^6.3.3",
         "@types/node": "^10.12.18",
         "mocha": "^5.2.0",
         "mocha-typescript": "^1.1.17",

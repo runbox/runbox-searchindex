@@ -31,6 +31,7 @@ const contents = [
 let addTermToDocument: (idterm: string, termname: string) => void;
 let removeTermFromDocument: (idterm: string, termname: string) => void;
 let addTextToDocument: (idterm: string, withoutpositions: boolean, text: string) => void;
+let getDocIdFromUniqueIdTerm: (idterm: string) => number;
 
 /**
  * Change folder in xapian test
@@ -49,6 +50,7 @@ let addTextToDocument: (idterm: string, withoutpositions: boolean, text: string)
             addTermToDocument = global['Module'].cwrap('addTermToDocument', null, ['string', 'string']);
             removeTermFromDocument = global['Module'].cwrap('removeTermFromDocument', null, ['string', 'string']);
             addTextToDocument = global['Module'].cwrap('addTextToDocument', null, ['string', 'boolean', 'string']);
+            getDocIdFromUniqueIdTerm = global['Module'].cwrap('getDocIdFromUniqueIdTerm', 'number', ['string']);
             done();
         });                        
     }
@@ -245,5 +247,26 @@ let addTextToDocument: (idterm: string, withoutpositions: boolean, text: string)
        // With positions, must match exact phrase
        results = xapian.sortedXapianQuery(`folder:"Otherpartition" AND "brequrianis xulaxis"`, 0, 0, 0, 100000, -1);
        equal(0, results.length);
+    }
+
+    @test() getDocumentByIdTermAndModify() {        
+        const xapian = new XapianAPI();
+        let results = xapian.sortedXapianQuery(`folder:"Otherpartition"`, 0, 0, 0, 1, -1);
+        
+        const unique_id_term = xapian.getDocumentData(results[0][0]).split('\t')[0];
+        const docid = getDocIdFromUniqueIdTerm(unique_id_term);
+        equal(results[0][0], docid);
+
+        xapian.documentXTermList(docid);
+        let termlistresult: string[] = global['Module']['documenttermlistresult'];
+        equal(1, termlistresult.filter(term => term === 'XFOLDER:Otherpartition').length);
+        xapian.changeDocumentsFolder(unique_id_term, 'TestFolder1523');
+        
+        xapian.documentXTermList(docid);
+        termlistresult = global['Module']['documenttermlistresult'];
+
+        equal(1, xapian.sortedXapianQuery(`folder:"TestFolder1523"`, 0, 0, 0, 1, -1).length);
+        equal(1, termlistresult.filter(term => term === 'XFOLDER:TestFolder1523').length);
+        equal(0, termlistresult.filter(term => term === 'XFOLDER:Otherpartition').length);
     }
 }

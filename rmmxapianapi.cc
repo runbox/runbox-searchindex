@@ -399,6 +399,16 @@ extern "C" {
       dbc->clearValueRange();
     }
     
+    int EMSCRIPTEN_KEEPALIVE getDocIdFromUniqueIdTerm(char * unique_id_term) {
+      Xapian::PostingIterator p = dbc->db.postlist_begin(unique_id_term);
+      
+      if (p != dbc->db.postlist_end(unique_id_term)) {
+        return *p;
+      } else {
+        return 0;
+      }
+    }
+    
     int EMSCRIPTEN_KEEPALIVE documentTermList(int docid) {
       Xapian::Document doc = dbc->db.get_document(docid);
       int numterms = 0;      

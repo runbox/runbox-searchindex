@@ -10,7 +10,7 @@ export function loadXapian(): AsyncSubject<boolean> {
     if(!xapianLoadedSubject) {
         xapianLoadedSubject = new AsyncSubject();
         
-        const xapian = require(`${process.cwd()}/xapianasm.js`);
+        const xapian = require(`${process.cwd()}/dist/xapianasm.js`);
     
         global.termlistresult = [];
         global.Module = xapian;
