@@ -1,6 +1,6 @@
 {
     "name": "runbox-searchindex",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "scripts": {
         "build": "node compilermmxapianapi.js --xapiandir=xapian/xapian-core && tsc",
         "test": "mocha-typescript-watch -p tsconfig.json build/test/test.js",

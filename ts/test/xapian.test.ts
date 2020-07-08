@@ -1,5 +1,5 @@
 import { suite, test, timeout } from "@testdeck/mocha";
-import { equal } from 'assert';
+import { equal, notEqual, ok } from 'assert';
 
 import { existsSync, mkdirSync } from 'fs';
 import { execSync } from 'child_process';
@@ -16,6 +16,7 @@ declare var FS, MEMFS, NODEFS;
 
 
 const totalMessages = 20000;
+const initialSeenMessages = 1234;
 const messages: MessageInfo[] = [];
 const messagesById: {[id: number]: MessageInfo} = {};
 
@@ -79,7 +80,7 @@ const contents = [
             const msg = new MessageInfo(id, new Date(id * 6 * 60 * 60 * 1000),
                 new Date(id * 6 * 60 * 60 * 1000),
                 'Inbox',
-                false,
+                (id <= initialSeenMessages),
                 false,
                 false,
                 [new MailAddressInfo('Sender', 'sender@runbox.com')],
@@ -182,6 +183,45 @@ const contents = [
             const subject = dparts[2];
             equal(messagesById[id].subject, subject);
         });
+    }
+
+    @test() folderMessageCounters() {
+        const xapian = new XapianAPI();
+
+        const [fastTotal, fastUnread] = xapian.getFolderMessageCounts('Testfolder');
+        const sortedUnread = xapian.sortedXapianQuery(`folder:"Testfolder" AND NOT flag:seen`, 0, 0, 0, 100000, -1).length;
+        const sortedTotal  = xapian.sortedXapianQuery(`folder:"Testfolder"`, 0, 0, 0, 100000, -1).length;
+
+        console.log(fastTotal, fastUnread, sortedTotal, sortedUnread);
+
+        notEqual(sortedTotal, sortedUnread); // make sure this test makes sense
+        equal(fastUnread, sortedUnread);
+        equal(fastTotal, sortedTotal);
+    }
+
+    @test(timeout(10000)) folderMessageCounterBenchmark() {
+        const xapian = new XapianAPI();
+        const iterations = 1_000;
+
+        console.log("Checking using sortedXapianQuery...");
+        const timestamp = (): number => (new Date()).getTime();
+        let t1 = timestamp();
+        for (let i = 0; i < iterations; i++) {
+            xapian.sortedXapianQuery(`folder:"Testfolder" AND NOT flag:seen`, 0, 0, 0, 100000, -1).length;
+            xapian.sortedXapianQuery(`folder:"Testfolder"`, 0, 0, 0, 100000, -1).length;
+        }
+
+        const sortedQueryTime = timestamp() - t1;
+        console.log(`sortedXapianQuery runtime: ${sortedQueryTime}ms (${sortedQueryTime / iterations}ms per query)`);
+
+        console.log("Checking using getFolderMessageCounts...");
+        t1 = timestamp();
+        for (let i = 0; i < iterations; i++) {
+            xapian.getFolderMessageCounts('Testfolder');
+        }
+        const getFolderMessageCountsTime = timestamp() - t1;
+        console.log(`getFolderMessageCounts runtime: ${getFolderMessageCountsTime}ms (${getFolderMessageCountsTime / iterations}ms per query)`);
+        ok(sortedQueryTime >  (2 * getFolderMessageCountsTime), 'getFolderMessageCounts() is noticably faster than using sortedXapianQuery()');
     }
 
     @test(timeout(10000)) moveMessages2() {
@@ -330,8 +370,6 @@ const contents = [
         results = xapian.sortedXapianQuery(`flag:flagged`, 0, 0, 0, 100000, -1);
         console.log('Number of flagged messages after flagging', results.length);
         equal(results.length, 1);       
-
-        
     }
 
     @test() answeredmessage() {
@@ -349,27 +387,22 @@ const contents = [
         results = xapian.sortedXapianQuery(`flag:answered`, 0, 0, 0, 100000, -1);
         console.log('Number of flagged messages after flagging answered', results.length);
         equal(results.length, 1);       
-
-        
     }
 
     @test() seenmessage() {
         const xapian = new XapianAPI();
 
-        let results = xapian.sortedXapianQuery(`flag:seen`, 0, 0, 0, 100000, -1);
-        console.log('Number of flagged messages before seen flag', results.length);
-        equal(results.length, 0);        
+        const seenBeforeChange = xapian.sortedXapianQuery(`flag:seen`, 0, 0, 0, 100000, -1).length;
+        console.log('Number of flagged messages before seen flag', seenBeforeChange);
 
         const indexer : IndexingTools = new IndexingTools(xapian);
         const flaggedMessage = messages[2];
         flaggedMessage.seenFlag = true;
         indexer.addMessageToIndex(flaggedMessage);
 
-        results = xapian.sortedXapianQuery(`flag:seen`, 0, 0, 0, 100000, -1);
-        console.log('Number of flagged messages after seen', results.length);
-        equal(results.length, 1);       
-
-        
+        const seenAfterChange = xapian.sortedXapianQuery(`flag:seen`, 0, 0, 0, 100000, -1).length;
+        console.log('Number of flagged messages after seen', seenAfterChange);
+        equal(seenAfterChange, seenBeforeChange + 1);
     }
 
     @test() messagewithattachment() {
@@ -387,8 +420,5 @@ const contents = [
         results = xapian.sortedXapianQuery(`flag:attachment`, 0, 0, 0, 100000, -1);
         console.log('Number of attachment messages after attachment flag', results.length);
         equal(results.length, 1);       
-
-        
     }
-
 }

@@ -2,6 +2,7 @@
 
 #include <emscripten.h>
 #include <cstdlib>
+#include <climits>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -521,6 +522,58 @@ extern "C" {
         folderlist[0] = 0;
       }
       return numfolders;
+    }
+
+    // returns a pair: [total, unread] in `results[]`
+    int EMSCRIPTEN_KEEPALIVE getFolderMessageCounts(const char *folderName, int results[]) {
+        if (!dbc) return 0;
+
+        Xapian::QueryParser queryparser;
+        queryparser.set_database(dbc->db);
+        queryparser.add_boolean_prefix("folder", "XFOLDER:");
+        queryparser.add_boolean_prefix("flag", "XF");
+
+        string queryString = "folder:\"";
+        queryString += folderName;
+        queryString += "\"";
+
+        try {
+            {
+                Xapian::Enquire enquire(dbc->db);
+                Xapian::Query query = queryparser.parse_query(
+                    queryString + " AND NOT flag:seen",
+                    Xapian::QueryParser::FLAG_DEFAULT | Xapian::QueryParser::FLAG_PARTIAL
+                );
+
+                enquire.set_query(query);
+                Xapian::MSet mset = enquire.get_mset(0, UINT_MAX);
+                results[1] = mset.size();
+            }
+
+            {
+                Xapian::Enquire enquire(dbc->db);
+                Xapian::Query query = queryparser.parse_query(
+                    queryString,
+                    Xapian::QueryParser::FLAG_DEFAULT | Xapian::QueryParser::FLAG_PARTIAL
+                );
+
+                enquire.set_query(query);
+                Xapian::MSet mset = enquire.get_mset(0, UINT_MAX);
+                results[0] = mset.size();
+            }
+
+            return 1;
+        } catch(const Xapian::QueryParserError e) {
+            cout << "Invalid query: " << queryString << endl;
+            return 0;
+        } catch(const Xapian::Error e) {
+            cout << "Error: " << e.get_type() << " "
+                << e.get_msg() << " "
+                << e.get_error_string() << " "
+                << e.get_description()
+                << endl;
+            return 0;
+        }
     }
 
     int EMSCRIPTEN_KEEPALIVE sortedXapianQuery(char * searchtext, 
