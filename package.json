@@ -2,17 +2,18 @@
     "name": "runbox-searchindex",
     "version": "0.1.0",
     "scripts": {
-        "build": "node compilermmxapianapi.js",
+        "build": "node compilermmxapianapi.js --xapiandir=xapian/xapian-core && tsc",
         "test": "mocha-typescript-watch -p tsconfig.json build/test/test.js",
         "test-no-watch": "tsc -p tsconfig.json && mocha build/test/test.js",
-        "preparelib": "node preparelibrary.js"
+        "preparelib": "cp -r build/xapian/* dist/ && node preparelibrary.js"
     },
     "devDependencies": {
-        "runbox7lib": "^0.2.0",
-        "rxjs": "^6.3.3",
+        "@testdeck/mocha": "0.1.0",
+        "@types/chai": "^4.2.12",
         "@types/node": "^10.12.18",
-        "mocha": "^5.2.0",
-        "mocha-typescript": "^1.1.17",
+        "chai": "^4.2.0",
+        "mocha": "^8.1.1",
+        "rxjs": "^6.3.3",
         "typescript": "^3.2.2"
     }
 }

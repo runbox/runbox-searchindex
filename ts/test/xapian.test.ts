@@ -1,12 +1,13 @@
-import { suite, test, only, slow, timeout } from 'mocha-typescript';
-import { equal, ok } from 'assert';
+import { suite, test, timeout } from "@testdeck/mocha";
+import { equal } from 'assert';
 
-import { existsSync, unlinkSync, watch, mkdirSync } from 'fs';
-import { execSync, ChildProcess } from 'child_process';
+import { existsSync, mkdirSync } from 'fs';
+import { execSync } from 'child_process';
 
-import { loadXapian } from './xapian.loader';
-import { XapianAPI } from 'runbox7lib';
-import { IndexingTools, MessageInfo, MailAddressInfo } from 'runbox7lib';
+import { loadXapian } from '../xapian/xapian.loader';
+import { XapianAPI } from '../xapian/rmmxapianapi';
+import { IndexingTools, MessageInfo } from '../xapian/messageinfo';
+import { MailAddressInfo } from '../xapian/mailaddressinfo';
 
 const XAPIANFSTYPE: string = 'MEM';
 // const XAPIANFSTYPE: string = 'NODE';

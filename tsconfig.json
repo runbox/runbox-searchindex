@@ -3,6 +3,7 @@
     "outDir": "build",
     "target": "es5",
     "module": "commonjs", 
+    "declaration":true,
     "sourceMap": true,   
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -13,6 +14,7 @@
     ]
   },
   "files": [    
+    "ts/xapian/index.ts",
     "ts/test/test.ts"
   ]  
 }
