@@ -1,5 +1,6 @@
-export { XapianTest } from '../xapian/xapian.test';
-export { ChangeFolderTest } from '../xapian/changefolder.test';
-export { ModifyDocTermsTest } from '../xapian/modifydocterms.test';
-export { SearchTest } from '../xapian/search.test';
-
+export { XapianTest          } from './xapian.test';
+export { ChangeFolderTest    } from './changefolder.test';
+export { ModifyDocTermsTest  } from './modifydocterms.test';
+export { SearchTest          } from './search.test';
+export { MessageInfoTest     } from './messageinfo.test';
+export { MailAddressInfoTest } from './mailaddressinfo.test';

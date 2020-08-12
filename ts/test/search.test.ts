@@ -1,8 +1,9 @@
-import { suite, test, slow, timeout, only } from 'mocha-typescript';
-import { XapianAPI } from 'runbox7lib';
+import { suite, test } from "@testdeck/mocha";
 import { equal } from 'assert';
-import { loadXapian } from './xapian.loader';
-import { MailAddressInfo, MessageInfo, IndexingTools } from 'runbox7lib';
+import { loadXapian } from '../xapian/xapian.loader';
+import { XapianAPI } from '../xapian/rmmxapianapi';
+import { IndexingTools, MessageInfo } from '../xapian/messageinfo';
+import { MailAddressInfo } from '../xapian/mailaddressinfo';
 
 
 declare var FS, MEMFS, Module;
