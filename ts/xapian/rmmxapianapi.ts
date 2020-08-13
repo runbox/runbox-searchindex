@@ -145,6 +145,63 @@ export class XapianAPI {
       return results;
   }
 
+  public getFolderMessageCounts_noFullSet(folder: string): number[] {
+      const $folderString = emAllocateString(folder);
+      const $results = Module._malloc(4 * 2);
+      Module.HEAP8.set(new Uint8Array(4 * 2), $results);
+
+      const ret = Module._getFolderMessageCounts_noFullSet($folderString, $results);
+      let results: number[];
+
+      if (ret !== 0) {
+          results = new Array(2);
+          results[0] = Module.getValue($results, 'i32');
+          results[1] = Module.getValue($results + 4, 'i32');
+      }
+
+      Module._free($folderString);
+      Module._free($results);
+      return results;
+  }
+
+  public getFolderMessageCounts_noQueryParser(folder: string): number[] {
+      const $folderString = emAllocateString(folder);
+      const $results = Module._malloc(4 * 2);
+      Module.HEAP8.set(new Uint8Array(4 * 2), $results);
+
+      const ret = Module._getFolderMessageCounts_noQueryParser($folderString, $results);
+      let results: number[];
+
+      if (ret !== 0) {
+          results = new Array(2);
+          results[0] = Module.getValue($results, 'i32');
+          results[1] = Module.getValue($results + 4, 'i32');
+      }
+
+      Module._free($folderString);
+      Module._free($results);
+      return results;
+  }
+
+  public getFolderMessageCounts_noQueryParser_noFullSet(folder: string): number[] {
+      const $folderString = emAllocateString(folder);
+      const $results = Module._malloc(4 * 2);
+      Module.HEAP8.set(new Uint8Array(4 * 2), $results);
+
+      const ret = Module._getFolderMessageCounts_noQueryParser_noFullSet($folderString, $results);
+      let results: number[];
+
+      if (ret !== 0) {
+          results = new Array(2);
+          results[0] = Module.getValue($results, 'i32');
+          results[1] = Module.getValue($results + 4, 'i32');
+      }
+
+      Module._free($folderString);
+      Module._free($results);
+      return results;
+  }
+
   public sortedXapianQuery(querystring: string,
     sortcol: number,
     reverse: number,
