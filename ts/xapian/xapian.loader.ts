@@ -6,11 +6,14 @@ declare var global;
 
 let xapianLoadedSubject: AsyncSubject<boolean>;
 
-export function loadXapian(): AsyncSubject<boolean> {
+export function loadXapian(path?: string): AsyncSubject<boolean> {
     if(!xapianLoadedSubject) {
         xapianLoadedSubject = new AsyncSubject();
         
-        const xapian = require(`${process.cwd()}/dist/xapianasm.js`);
+        if (!path) {
+            path = `${process.cwd()}/dist/xapianasm.js`
+        }
+        const xapian = require(path);
     
         global.termlistresult = [];
         global.Module = xapian;
