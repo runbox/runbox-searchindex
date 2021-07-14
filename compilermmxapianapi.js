@@ -22,7 +22,7 @@ if(!process.env.XAPIAN) {
       `-s "EXTRA_EXPORTED_RUNTIME_METHODS=['FS','cwrap','stringToUTF8','UTF8ToString','getValue']" ` +
       `-std=c++11 -s DEMANGLE_SUPPORT=1 -s ALLOW_MEMORY_GROWTH=1 ` +
       `-I$XAPIAN/include -I$XAPIAN -I$XAPIAN/common rmmxapianapi.cc $XAPIAN/.libs/libxapian.a ` +
-      `-o dist/xapianasm.js -lidbfs.js`, { stdio: 'inherit' });
+      `-o dist/xapianasm.js -lidbfs.js -lnodefs.js`, { stdio: 'inherit' });
     console.log('Successful build of xapianasm.wasm and xapianasm.js');
   } catch(e) {
     console.error('Compile failed');
