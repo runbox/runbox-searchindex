@@ -290,6 +290,9 @@ extern "C" {
     
     void EMSCRIPTEN_KEEPALIVE reloadDatabase() {
         dbc->db.reopen();
+        for(Xapian::WritableDatabase dbw : dbc->addedWritableDatabases) {
+          dbw.reopen();
+        }
         cout << "Database reopened" << endl;
     }
     

@@ -33,9 +33,9 @@ https://github.com/xapian/xapian/blob/master/xapian-core/emscripten/README.md
 In order to build the web assembly binaries you will have to set the `XAPIAN` environment variable to
 the location of the `xapian_core` folder of your Xapian emscripten build.
 
-You may then build it using `XAPIAN=xapian_core_location npm run build`
+You may then build it using `npm run build --xapiandir=xapian_core_location`
 
-You can also have a look at the [.travis.yml](.travis.yml) file for a complete build and test procedure (which is run on every push).
+You can also have a look at the [Github CI](.github/workflows/ci.yml) file for a complete build and test procedure (which is run on every push).
 
 ## Running tests
 

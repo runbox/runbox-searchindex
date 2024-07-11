@@ -1,11 +1,12 @@
 {
     "name": "@runboxcom/runbox-searchindex",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "scripts": {
-        "build": "node compilermmxapianapi.js --xapiandir=xapian/xapian-core && tsc",
+        "build": "XAPIAN=xapian/xapian-core node compilermmxapianapi.js && tsc",
         "test": "mocha-typescript-watch -p tsconfig.json build/test/test.js",
         "test-no-watch": "tsc -p tsconfig.json && mocha build/test/test.js",
-        "preparelib": "cp -r build/xapian/* dist/ && node preparelibrary.js"
+        "preparelib": "cp -r build/xapian/* dist/ && node preparelibrary.js && cp README.md dist/",
+        "prepare": "npm run build && npm run test-no-watch && npm run preparelib"
     },
     "devDependencies": {
         "@testdeck/mocha": "0.1.0",
