@@ -3,7 +3,7 @@ THREADS=${THREADS:-2}
 
 git clone https://github.com/xapian/xapian
 cd xapian
-git checkout v1.4.16
+git checkout v1.4.31
 ./bootstrap xapian-core
 ./configure CXXFLAGS=-O0 --disable-backend-honey --disable-backend-inmemory --disable-backend-remote
 make -j$THREADS
