@@ -1,6 +1,6 @@
 #!/bin/bash
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
-./emsdk install 1.39.19
-./emsdk activate 1.39.19
+./emsdk install 3.1.74
+./emsdk activate 3.1.74
 cd ..

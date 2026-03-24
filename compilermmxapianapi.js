@@ -19,8 +19,9 @@ if(!process.env.XAPIAN) {
       mkdirSync('dist');
     }
     execSync(`em++ -Oz -s DISABLE_EXCEPTION_CATCHING=0 -s USE_ZLIB=1 ` + 
-      `-s "EXTRA_EXPORTED_RUNTIME_METHODS=['FS','cwrap','stringToUTF8','UTF8ToString','getValue']" ` +
-      `-std=c++11 -s DEMANGLE_SUPPORT=1 -s ALLOW_MEMORY_GROWTH=1 ` +
+      `-s "EXPORTED_RUNTIME_METHODS=['FS','cwrap','stringToUTF8','UTF8ToString','getValue']" ` +
+      `-s "EXPORTED_FUNCTIONS=['_malloc', '_free']" ` +
+      `-std=c++11 -s ALLOW_MEMORY_GROWTH=1 ` +
       `-I$XAPIAN/include -I$XAPIAN -I$XAPIAN/common rmmxapianapi.cc $XAPIAN/.libs/libxapian.a ` +
       `-o dist/xapianasm.js -lidbfs.js -lnodefs.js`, { stdio: 'inherit' });
     console.log('Successful build of xapianasm.wasm and xapianasm.js');
